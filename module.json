@@ -1,0 +1,13 @@
+{
+    "name": "PorteMonnaie",
+    "alias": "portemonnaie",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\PorteMonnaie\\Providers\\PorteMonnaieServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}
