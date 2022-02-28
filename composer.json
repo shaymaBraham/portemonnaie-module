@@ -1,6 +1,7 @@
 {
     "name": "shayma/portemonnaie",
     "description": "",
+    "type": "laravel-module",
     "authors": [
         {
             "name": "shayma brahem",
