@@ -10,7 +10,8 @@
     ],
 
     "require": {      
-        "bavix/laravel-wallet": "^7.3"
+        "bavix/laravel-wallet": "^7.3",
+        "joshbrw/laravel-module-installer" :"^2.0"
     },
     "extra": {
         "laravel": {
