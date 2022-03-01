@@ -8,7 +8,10 @@
             "email": "shaymaabh@gmail.com"
         }
     ],
-   
+
+    "require": {      
+        "bavix/laravel-wallet": "^7.3"
+    },
     "extra": {
         "laravel": {
             "providers": [],
