@@ -14,5 +14,5 @@
 Route::prefix('portemonnaie')->group(function() {
     Route::get('/', 'PorteMonnaieController@index');
 
-    Route::post('/buy_product','PorteMonnaieController@buy_product')->name('buy_product');
+    Route::post('/alimenter','PorteMonnaieController@alimentation')->name('alimenter');
 });
