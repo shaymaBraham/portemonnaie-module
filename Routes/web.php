@@ -10,9 +10,9 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::group(['prefix' => '', 'as' => 'portemonnaie.',  'middleware' => ['auth']], function () {
 
-Route::prefix('portemonnaie')->group(function() {
-    Route::get('/', 'PorteMonnaieController@index');
+    Route::get('/portemonnaie', 'PorteMonnaieController@index')->name('index');
 
-    Route::post('/alimenter','PorteMonnaieController@alimentation')->name('alimenter');
+   
 });

@@ -1,6 +1,7 @@
 {
     "name": "shayma/portemonnaie-module",
     "description": "",
+    "version": "1.0.0",
     "type": "laravel-module",
     "authors": [
         {
@@ -9,10 +10,6 @@
         }
     ],
 
-    "require": {      
-        "bavix/laravel-wallet": "^7.3"
-        
-    },
     "extra": {
         "laravel": {
             "providers": [],
