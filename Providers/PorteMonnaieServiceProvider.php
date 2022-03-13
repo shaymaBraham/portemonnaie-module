@@ -4,6 +4,7 @@ namespace Modules\PorteMonnaie\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
+use Auth;
 
 class PorteMonnaieServiceProvider extends ServiceProvider
 {
@@ -28,6 +29,34 @@ class PorteMonnaieServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'Database/Migrations'));
+    
+        view()->composer('*', function ($view)
+        {
+            $user=Auth::user();
+            if($user){
+                if( !$user->hasWallet($user->id.'-wallet')){
+                    $wallet = $user->createWallet([
+                    'name' => 'New Wallet',
+                    'slug' => $user->id.'-wallet',
+                ]);
+                   
+        
+                   
+               }
+               else{
+                $wallet = $user->getWallet($user->id.'-wallet');
+                     
+               }
+               $view->with([
+
+                'userWallet' => $wallet,
+                
+                ] );
+            }
+          
+            
+
+        });
     }
 
     /**
