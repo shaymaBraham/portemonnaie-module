@@ -126,12 +126,12 @@ class PorteMonnaieController extends Controller
 
 
 
-    function buy_product($produit)
+    function buy_product($produit,$user)
     {
         try {
 
 
-            $user=Auth::user();
+            
             $classe=get_class($produit);
            
             $item=$produit;
