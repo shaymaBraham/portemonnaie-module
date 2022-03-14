@@ -8,6 +8,7 @@ use Illuminate\Routing\Controller;
 use Auth;
 use Modules\PorteMonnaie\Entities\Item;
 use Bavix\Wallet\Models\Transaction;
+use App\Models\User;
 class PorteMonnaieController extends Controller
 {
     /**
@@ -126,14 +127,14 @@ class PorteMonnaieController extends Controller
 
 
 
-    function buy_product($produit,$user)
+    function buy_product($produit,$user_id)
     {
         try {
 
 
             
             $classe=get_class($produit);
-           
+            $user = User::find($user_id);
             $item=$produit;
             $item->getAmountProduct($user); // 100
             $wallet = $user->getWallet($user->id.'-wallet');
