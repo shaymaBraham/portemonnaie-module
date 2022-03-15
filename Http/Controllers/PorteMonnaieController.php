@@ -21,17 +21,16 @@ class PorteMonnaieController extends Controller
         if($user){
             if( !$user->hasWallet($user->id.'-wallet')){
                 $wallet = $user->createWallet([
-                'name' => 'New Wallet',
+                'name' => $user->name.' Wallet',
                 'slug' => $user->id.'-wallet',
             ]);
-                $wallet->deposit(100);
-                $wallet->balance; // 100
+               
     
                
            }
            else{
             $wallet = $user->getWallet($user->id.'-wallet');
-                  $wallet->balance; // 100
+                 
            }
             $walletTransactions=Transaction::where('wallet_id',$wallet->id)->orderBy('id','desc')->get();
             return view('portemonnaie::index',compact('wallet','walletTransactions'));
@@ -293,6 +292,16 @@ class PorteMonnaieController extends Controller
            ->get();
 
            return $transactions;
+
+    }
+
+    public function get_Transfers($user)
+    {
+
+        $wallet = $user->getWallet($user->id.'-wallet');
+        $transfers=$wallet->transfers;
+
+           return $transfers;
 
     }
 
