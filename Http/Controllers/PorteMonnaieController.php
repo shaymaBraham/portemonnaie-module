@@ -133,14 +133,13 @@ class PorteMonnaieController extends Controller
 
 
             
-            $classe=get_class($produit);
             $user = User::find($user_id);
-            $item=$produit;
-            $item->getAmountProduct($user); // 100
+           
+            
             $wallet = $user->getWallet($user->id.'-wallet');
         
             
-            $transfer=$wallet->pay($item);
+            $transfer=$wallet->pay($produit);
 
             
            
@@ -154,20 +153,17 @@ class PorteMonnaieController extends Controller
         
     }
 
-    function buy_product_free($produit)
+    function buy_product_free($produit,$user_id)
     {
         try {
 
 
             $user=Auth::user();
-            $classe=get_class($produit);
            
-            $item=$produit;
-            $item->getAmountProduct($user); // 100
             $wallet = $user->getWallet($user->id.'-wallet');
            
             
-            $transfer=$wallet->payFree($item);
+            $transfer=$wallet->payFree($produit);
            
 
             
@@ -184,13 +180,14 @@ class PorteMonnaieController extends Controller
     function transfer($user_to,$user_from,$amount)
     {
         
-        if($user_to->getKey() !== $user_from->getKey()) 
+        if($user_to->id !== $user_from->id) 
         {
 
-            $user_to->balance; 
-            $user_from->balance; 
+            $wallet_to = $user->getWallet($user_to->id.'-wallet');
+            $wallet_from = $user->getWallet($user_from->id.'-wallet');
 
-            if($user_from->balance > $amount){
+            if($wallet_from->balance > $amount){
+
                 $user_from->transfer($user_to, $amount); 
             }
             
@@ -212,14 +209,18 @@ class PorteMonnaieController extends Controller
     function forceTransfer($user_to,$user_from,$amount)
     {
         
-        if($user_to->getKey() !== $user_from->getKey()) 
+       if($user_to->id !== $user_from->id) 
         {
 
-            $user_to->balance; 
-            $user_from->balance; 
+            $wallet_to = $user->getWallet($user_to->id.'-wallet');
+            $wallet_from = $user->getWallet($user_from->id.'-wallet');
+            
+            if($wallet_from->balance > $amount){
 
-          
                 $user_from->forceTransfer($user_to, $amount); 
+            }
+          
+               
             
             
             
@@ -238,15 +239,10 @@ class PorteMonnaieController extends Controller
         try {
 
 
-            $user=Auth::user();
-            $classe=get_class($produit);
            
-            $item=$produit;
-            $item->getAmountProduct($user); // 100
             $wallet = $user->getWallet($user->id.'-wallet');
-          
-            
-           $wallet->refund($item);
+                      
+            $wallet->refund($produit);
             
             
 
@@ -262,13 +258,14 @@ class PorteMonnaieController extends Controller
     public function offrir($user_to,$user_from,$produit)
     {
 
-        if($user_to->getKey() !== $user_from->getKey()) 
+        if($user_to->id !== $user_from->id) 
         {
 
-            $user_to->balance; 
-            $user_from->balance; 
+            $wallet_to = $user->getWallet($user_to->id.'-wallet');
+            $wallet_from = $user->getWallet($user_from->id.'-wallet');
+          
 
-            if($user_from->balance > $produit->balance)
+            if($wallet_from->balance > $produit->getAmountProduct($user_from))
             {
 
                 $user_from->gift($user_to, $produit); 
@@ -299,8 +296,5 @@ class PorteMonnaieController extends Controller
 
     }
 
-    public function confirm_transaction($id_transaction)
-    {
-
-    }
+    
 }
