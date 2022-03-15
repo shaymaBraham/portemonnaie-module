@@ -9,6 +9,9 @@ use Auth;
 use Modules\PorteMonnaie\Entities\Item;
 use Bavix\Wallet\Models\Transaction;
 use App\Models\User;
+use Modules\PaiementGateways\Entities\ModePaiement;
+
+
 class PorteMonnaieController extends Controller
 {
     /**
@@ -32,8 +35,10 @@ class PorteMonnaieController extends Controller
             $wallet = $user->getWallet($user->id.'-wallet');
                  
            }
+
+           $modes_paiement=ModePaiement::all();
             $walletTransactions=Transaction::where('wallet_id',$wallet->id)->orderBy('id','desc')->get();
-            return view('portemonnaie::index',compact('wallet','walletTransactions'));
+            return view('portemonnaie::index',compact('wallet','walletTransactions','modes_paiement'));
         }
         else
         return redirect('/login');
