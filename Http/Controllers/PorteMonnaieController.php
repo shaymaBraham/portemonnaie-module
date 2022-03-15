@@ -139,6 +139,7 @@ class PorteMonnaieController extends Controller
         
             
             $transfer=$wallet->pay($produit);
+            return $transfer;
 
             
            
@@ -146,7 +147,7 @@ class PorteMonnaieController extends Controller
 
         } catch (Throwable $e) {
             
-                
+                return ['error'=>1,'message' => $e.getMessage()];
             
         }
         
