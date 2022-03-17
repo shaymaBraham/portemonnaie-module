@@ -48,38 +48,48 @@ class PorteMonnaieController extends Controller
     
 
 
-    function alimentation($user,$amount,?array $meta = null)
+
+    protected function alimentation($user,$amount,?array $meta = null)
     {
         
-       
-        if( !$user->hasWallet($user->id.'-wallet')){
-                $wallet = $user->createWallet([
-                'name' => 'New Wallet',
-                'slug' => $user->id.'-wallet',
-            ]);
+       try{
+                
+               if( !$user->hasWallet($user->id.'-wallet')){
+                    $wallet = $user->createWallet([
+                    'name' => $user->name.' Wallet',
+                    'slug' => $user->id.'-wallet',
+                ]);
+                
+                }
+                else{
+                    $wallet = $user->getWallet($user->id.'-wallet');
+                        
+                }
+
+                $transaction=$wallet->deposit($amount,$meta);
+
                
-           }
-           else{
-               $wallet = $user->getWallet($user->id.'-wallet');
-                  
-           }
+                return ['success'=>1,'data'=>$transaction->id,'message' => ""];
 
-           $transaction=$wallet->deposit($amount,$meta);
 
-           return $transaction->id;
+       }
 
+       catch (Throwable $e) {
+        return ['success'=>0,'data'=>null,'message' => $e.getMessage()];
+       }
+        
 
 
     }
 
 
-    function retrait($user,$amount)
+    protected function retrait($user,$amount)
     {
         
-       
+       try{
         if( !$user->hasWallet($user->id.'-wallet')){
                 $wallet = $user->createWallet([
-                'name' => 'New Wallet',
+                'name' => $user->name.' Wallet',
                 'slug' => $user->id.'-wallet',
             ]);
                
@@ -95,17 +105,27 @@ class PorteMonnaieController extends Controller
            {
             $transaction=$wallet->withdraw($amount);
 
+            return ['success'=>1,'data'=>$transaction,'message' => ""];
+
+
+           }
+           else{
+
            }
 
-           
+        }
+
+        catch (Throwable $e) {
+            return ['success'=>0,'data'=>null,'message' => $e.getMessage()];
+        } 
                  
             
 
     }
 
-    function retrait_force($user,$amount)
+    protected function retrait_force($user,$amount)
     {
-        
+        try{
        
         if( !$user->hasWallet($user->id.'-wallet')){
                 $wallet = $user->createWallet([
@@ -122,7 +142,13 @@ class PorteMonnaieController extends Controller
 
            $transaction=$wallet->forcewithdraw($amount);
 
-           
+           return ['success'=>1,'data'=>$transaction,'message' => ""];
+
+        }
+
+        catch (Throwable $e) {
+            return ['success'=>0,'data'=>null,'message' => $e.getMessage()];
+        }
                  
             
 
@@ -131,7 +157,7 @@ class PorteMonnaieController extends Controller
 
 
 
-    function buy_product($produit,$user_id)
+    protected function buy_product($produit,$user_id)
     {
         try {
 
@@ -143,22 +169,22 @@ class PorteMonnaieController extends Controller
             $wallet = $user->getWallet($user->id.'-wallet');
         
             
-            $transfer=$wallet->pay($produit);
-            return $transfer;
+                $transfer=$wallet->pay($produit);
 
-            
+                return ['success'=>1,'data'=>$transfer,'message' => ""];
+ 
            
 
 
         } catch (Throwable $e) {
             
-                return ['error'=>1,'message' => $e.getMessage()];
+                return ['success'=>0,'data'=>null,'message' => $e.getMessage()];
             
         }
         
     }
 
-    function buy_product_free($produit,$user_id)
+    protected  function buy_product_free($produit,$user_id)
     {
         try {
 
@@ -171,48 +197,60 @@ class PorteMonnaieController extends Controller
             $transfer=$wallet->payFree($produit);
            
 
-            
+            return ['success'=>1,'data'=>$transfer,'message' => ""];
 
 
         } catch (Throwable $e) {
             
                 
-            
+            return ['success'=>0,'data'=>null,'message' => $e.getMessage()];
         }
         
     }
 
-    function transfer($user_to,$user_from,$amount)
+    protected  function transfer($user_to,$user_from,$amount)
     {
+        try{
         
-        if($user_to->id !== $user_from->id) 
-        {
+            if($user_to->id !== $user_from->id) 
+            {
 
-            $wallet_to = $user->getWallet($user_to->id.'-wallet');
-            $wallet_from = $user->getWallet($user_from->id.'-wallet');
+                $wallet_to = $user->getWallet($user_to->id.'-wallet');
+                $wallet_from = $user->getWallet($user_from->id.'-wallet');
 
-            if($wallet_from->balance > $amount){
+                if($wallet_from->balance > $amount){
 
-                $user_from->transfer($user_to, $amount); 
-            }
-            
-            
-           else{
+                    $transfer=$user_from->transfer($user_to, $amount); 
 
-            //exception solde insuffisant
-           }
-        }
-        else{
+                    return ['success'=>1,'data'=>$transfer,'message' => ""];
 
-            //exception user to equal user from
-        }
+                }
                 
-          
+                
+            else{
+
+                //exception solde insuffisant
+                return ['success'=>0,'data'=>null,'message' => "solde insuffisant"];
+            }
+            }
+            else{
+
+                //exception user to equal user from
+
+                return ['success'=>0,'data'=>null,'message' => "you cannot transfer to yourself"];
+            }
+                    
+      }
+
+      catch (Throwable $e) {
+        return ['success'=>0,'data'=>null,'message' => $e.getMessage()];
+      }
 
     }
 
-    function forceTransfer($user_to,$user_from,$amount)
+    protected  function forceTransfer($user_to,$user_from,$amount)
     {
+        try{
         
        if($user_to->id !== $user_from->id) 
         {
@@ -222,7 +260,10 @@ class PorteMonnaieController extends Controller
             
             if($wallet_from->balance > $amount){
 
-                $user_from->forceTransfer($user_to, $amount); 
+                $transfer=$user_from->forceTransfer($user_to, $amount); 
+
+                return ['success'=>1,'data'=>$transfer,'message' => ""];
+
             }
           
                
@@ -234,62 +275,83 @@ class PorteMonnaieController extends Controller
         else{
 
             //exception user to equal user from
+            return ['success'=>0,'data'=>null,'message' => "you cannot transfer to yourself"];
         }
+
+    }
+
+    catch (Throwable $e) {
+        return ['success'=>0,'data'=>null,'message' => $e.getMessage()];
+      }
     }
 
 
-    public function rembourser($user,$produit)
+    protected function rembourser($user,$produit)
     {
 
         try {
 
 
-           
-            $wallet = $user->getWallet($user->id.'-wallet');
-                      
-            $wallet->refund($produit);
-            
+                                             
+            $retour=$user->refund($produit);
+
+            //retourne true or false
+
+            return ['success'=>1,'data'=>$retour,'message' => ""];
+
             
 
 
         } catch (Throwable $e) {
             
-             
+            return ['success'=>0,'data'=>null,'message' => $e.getMessage()]; 
             
         }
         
     }
 
-    public function offrir($user_to,$user_from,$produit)
+    protected function offrir($user_to,$user_from,$produit)
     {
 
-        if($user_to->id !== $user_from->id) 
-        {
+        try{
+                if($user_to->id !== $user_from->id) 
+                {
 
-            $wallet_to = $user->getWallet($user_to->id.'-wallet');
-            $wallet_from = $user->getWallet($user_from->id.'-wallet');
-          
+                    $wallet_to = $user->getWallet($user_to->id.'-wallet');
+                    $wallet_from = $user->getWallet($user_from->id.'-wallet');
+                
 
-            if($wallet_from->balance > $produit->getAmountProduct($user_from))
-            {
+                    if($wallet_from->balance > $produit->getAmountProduct($user_from))
+                    {
 
-                $user_from->gift($user_to, $produit); 
+                        $transfer=$user_from->gift($wallet_to, $produit); 
+
+                        return ['success'=>1,'data'=>$transfer,'message' => ""];
+
+
+                    }
+                    
+                    
+                else{
+                    return ['success'=>0,'data'=>null,'message' => "solde insuffisant"];
+                    //exception solde insuffisant
+                }
+                }
+                else{
+
+                    //exception user to equal user from
+                    return ['success'=>0,'data'=>null,'message' => "you cannot gift yourself"];
+                }
+
             }
-            
-            
-           else{
 
-            //exception solde insuffisant
-           }
-        }
-        else{
-
-            //exception user to equal user from
-        }
+            catch (Throwable $e) {
+                return ['success'=>0,'data'=>null,'message' => $e.getMessage()];
+            }
         
     }
 
-    public function get_Transactions($model,$model_id)
+    protected function get_Transactions($model,$model_id)
     {
 
            $transactions=Transaction::where('payable_type',$model)
@@ -301,13 +363,22 @@ class PorteMonnaieController extends Controller
 
     }
 
-    public function get_Transfers($user)
+    protected function get_walletTransfers($user)
     {
 
         $wallet = $user->getWallet($user->id.'-wallet');
         $transfers=$wallet->transfers;
 
            return $transfers;
+
+    }
+
+    protected function getAllTransactions()
+    {
+
+           $allTransactions=Transaction::orderBy('id','desc')->get();
+
+           return $allTransactions;
 
     }
 
